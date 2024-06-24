@@ -114,18 +114,19 @@ class _LoginState extends State<Login> {
                           );
                         },
                       ),
+                      SizedBox(height: 10,),
                       BlocBuilder<LoginCubit, LoginState>(
                         builder: (context, state) {
                           if (state is LoginValidState) {
                             return Text(
                               'User Exist',
-                              style: TextStyle(color: Colors.green),
+                              style: TextStyle(color: Colors.green, fontSize: 20 , fontWeight:  FontWeight.bold),
                             );
                           }
                           else if(state is LoginErrorState){
                             return Text(
                               'User Not Exist',
-                              style: TextStyle(color: Colors.red),
+                              style: TextStyle(color: Colors.red, fontSize: 20 , fontWeight:  FontWeight.bold),
                             );
                           }
                           else{

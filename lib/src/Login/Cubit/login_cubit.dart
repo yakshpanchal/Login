@@ -8,6 +8,7 @@ class LoginCubit extends Cubit<LoginState> {
   LoginCubit() : super(LoginInitialState());
 
   Future<void> validateForm(String mobile, String password) async {
+
     if (password.isEmpty || mobile.isEmpty || mobile=='' || password == '') {
       emit(LoginErrorState('Mobile and Password cannot be empty'));
     }
@@ -20,9 +21,10 @@ class LoginCubit extends Cubit<LoginState> {
     else if(!RegExp(r'^\d{10}$').hasMatch(mobile)){
       emit(LoginErrorState('Invalid mobile number'));
     }
-    // else if(!RegExp(r'^\d{6}$').hasMatch(password)){
-    //   emit(LoginErrorState('Password must be at least 6 character'));
-    // }
+    else if(!RegExp(r'^\d{6}$').hasMatch(password)){
+      emit(LoginErrorState('Password must be at least 6 character'));
+    }
+
     else{
       // emit(LoginValidState());
       final apicall = await API().getUserByMobile(mobile, password);
