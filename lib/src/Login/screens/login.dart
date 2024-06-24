@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,8 +19,40 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  String? _deviceId;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDeviceId();
+  }
+
+  Future<void> _fetchDeviceId() async {
+    String? deviceId = await _getId();
+    setState(() {
+      _deviceId = deviceId;
+    });
+  }
+
+  // here this is a function for device_id
+  Future<String?> _getId() async {
+    var deviceInfo = DeviceInfoPlugin();
+    if (Platform.isIOS) { // import 'dart:io'
+      var iosDeviceInfo = await deviceInfo.iosInfo;
+      return iosDeviceInfo.identifierForVendor; // unique ID on iOS
+    } else if (Platform.isAndroid) {
+      var androidDeviceInfo = await deviceInfo.androidInfo;
+      return androidDeviceInfo.id; // unique ID on Android
+    }
+    return null;
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -56,25 +91,35 @@ class _LoginState extends State<Login> {
                         // Set obscureText to true for password
                         onChanged: (value) {
                           // Perform validation here if needed
-                          BlocProvider.of<LoginCubit>(context).validateForm(_mobileController.text, _passwordController.text);
+                          BlocProvider.of<LoginCubit>(context).validateForm(
+                            _mobileController.text,
+                            _deviceId
+                          );
                         },
                       ),
                       const SizedBox(
                         height: 30,
                       ),
-                      CustomTextFormFiled(
-                        labelText: 'Password',
-                        inputFormatters: [
-                          FilteringTextInputFormatter.singleLineFormatter
-                        ],
-                        controller: _passwordController,
-                        enabled: true,
-                        keyboardType: TextInputType.visiblePassword,
-                        obscureText: true,
-                        // Set obscureText to true for password
-                        onChanged: (value) {
-                          // Perform validation here if needed
-                        },
+                      Visibility(
+                        visible: false,
+                        child: CustomTextFormFiled(
+                          labelText: 'Password',
+                          inputFormatters: [
+                            FilteringTextInputFormatter.singleLineFormatter
+                          ],
+                          controller: _passwordController,
+                          enabled: true,
+                          keyboardType: TextInputType.visiblePassword,
+                          obscureText: true,
+                          // Set obscureText to true for password
+                          onChanged: (value) {
+                            // Perform validation here if needed
+                            BlocProvider.of<LoginCubit>(context).validateForm(
+                              _mobileController.text,
+                              _deviceId
+                            );
+                          },
+                        ),
                       ),
                       const SizedBox(
                         height: 10,
@@ -101,12 +146,12 @@ class _LoginState extends State<Login> {
                             textColor: Colors.white,
                             elevation: 4,
                             borderRadius: 3,
-                            onPressed: () {
+                            onPressed: _deviceId == null ? null : () {
                               final mobile = _mobileController.text;
                               final password = _passwordController.text;
                               context
                                   .read<LoginCubit>()
-                                  .validateForm(mobile, password);
+                                  .validateForm(mobile, _deviceId!);
                             },
                             buttonWidth: 400,
                             buttonHeight: 50,
@@ -114,28 +159,34 @@ class _LoginState extends State<Login> {
                           );
                         },
                       ),
-                      SizedBox(height: 10,),
+                      SizedBox(
+                        height: 10,
+                      ),
+
+                      // here for valid user exist | not
                       BlocBuilder<LoginCubit, LoginState>(
                         builder: (context, state) {
                           if (state is LoginValidState) {
                             return Text(
                               'User Exist',
-                              style: TextStyle(color: Colors.green, fontSize: 20 , fontWeight:  FontWeight.bold),
+                              style: TextStyle(
+                                  color: Colors.green,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
                             );
-                          }
-                          else if(state is LoginErrorState){
+                          } else if (state is LoginErrorState) {
                             return Text(
                               'User Not Exist',
-                              style: TextStyle(color: Colors.red, fontSize: 20 , fontWeight:  FontWeight.bold),
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
                             );
-                          }
-                          else{
+                          } else {
                             return Container();
                           }
-
                         },
                       ),
-
                     ],
                   ),
                 ),

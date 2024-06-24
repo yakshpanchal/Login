@@ -1,28 +1,15 @@
 import 'package:dio/dio.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 class API {
 
-  Future<int?> getUserByMobile(String mobile , String password) async {
+  Future<dynamic?> getUserByMobile(String mobile ,  String device_id) async {
     try {
-      final response = await Dio().post('https://staging.evitalrx.in:3000/v3/login',data: {
+      final response = await Dio().post('https://staging.evitalrx.in:3000/v3/login/verify_number',data: {
         'mobile':mobile,
-        'password' : password
+        'device_id' : device_id
       });
-      return response.statusCode;
+      return response.data;
     } catch (e) {
       return 0;
     }
   }
 }
-// // here _dio is private
-// Dio _dio = Dio();
-//
-// API() {
-//   _dio.options.baseUrl = ;
-//   // the interceptor is intercept each request
-//   _dio.interceptors
-//       .add(PrettyDioLogger()); // we add PrettyDioLogger as intercept
-// }
-// // now _dio is private so how can we use in outside
-// // for that we create a getter get sendRequest
-// Dio get sendResponse => Dio();

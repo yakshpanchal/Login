@@ -6,7 +6,7 @@ class CustomElevetedButton extends StatefulWidget {
   final Color textColor;
   final double elevation;
   final double borderRadius;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double buttonWidth;
   final double buttonHeight;
   final double buttontextSize;
@@ -18,7 +18,7 @@ class CustomElevetedButton extends StatefulWidget {
         required this.textColor,
         required this.elevation,
         required this.borderRadius,
-        required this.onPressed,
+        this.onPressed,
         required this.buttonWidth,
         required this.buttonHeight,
         required this.buttontextSize});
